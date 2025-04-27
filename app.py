@@ -18,6 +18,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from openai import OpenAI
 from wordcloud import WordCloud
 import io, base64
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Access your OpenAI API key from the environment variable
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 txt = ""
 # --- CONFIGURATION ---
@@ -28,7 +36,7 @@ app.secret_key = "YOUR_SECRET_KEY_HERE"  # ← change this!
 # Initialize NVIDIA Ollama-like OpenAI Endpoint
 client = OpenAI(
     base_url="https://integrate.api.nvidia.com/v1",
-    api_key="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"
+    api_key=openai_api_key
 )
 
 headers = {
