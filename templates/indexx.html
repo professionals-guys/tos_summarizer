@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOS & PP Scraper</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input[type="text"], input[type="submit"] {
+            padding: 15px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="submit"]:hover {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.6);
+        }
+
+        input[type="submit"] {
+            background-color: #4a90e2;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #357ab7;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            display: none;  /* Hide results initially */
+        }
+
+        .results h3 {
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .results h4 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .results p {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .results a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
+
+        .results a:hover {
+            text-decoration: underline;
+        }
+
+        .freq {
+            margin-top: 20px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .freq ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .freq li {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .freq h4 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        /* Loading Spinner Animation */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: auto;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Adding responsive design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            .results h3 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TOS & PP Scraper</h2>
+        <form method="POST">
+            <label for="domain">Enter a website domain (e.g., example.com):</label>
+            <input type="text" id="domain" name="domain" required>
+            <input type="submit" value="Scrape and Analyze">
+        </form>
+
+        <!-- Loader Animation -->
+        <div id="loading" style="display: none;">
+            <div class="loader"></div>
+            <p style="text-align: center;">Scraping and analyzing, please wait...</p>
+        </div>
+
+        {% if domain %}
+        <div class="results" id="results">
+            <h3>Results for {{ domain }}</h3>
+            <h4>Terms of Service Link:</h4>
+            <p><a href="{{ tos_link }}" target="_blank">{{ tos_link }}</a></p>
+
+            <h4>Privacy Policy Link:</h4>
+            <p><a href="{{ pp_link }}" target="_blank">{{ pp_link }}</a></p>
+
+            <h4>Terms of Service Summary:</h4>
+            <p>{{ summary_tos }}</p>
+            <h4>Privacy Policy Summary:</h4>
+            <p>{{ summary_pp }}</p>
+
+            <h4>One-line TOS Summary:</h4>
+            <p>{{ one_line_tos }}</p>
+            <h4>One-line PP Summary:</h4>
+            <p>{{ one_line_pp }}</p>
+
+            <div class="freq">
+                <h4>Top TOS Words:</h4>
+                <ul>
+                    {% for word, count in freq_tos %}
+                    <li>{{ word }}: {{ count }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h4>Top PP Words:</h4>
+                <ul>
+                    {% for word, count in freq_pp %}
+                    <li>{{ word }}: {{ count }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Show loading spinner when scraping
+        document.querySelector("form").addEventListener("submit", function() {
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("results").style.display = "none";
+        });
+
+        // Hide the loading spinner and show results once the data is ready
+        {% if domain %}
+        window.onload = function() {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("results").style.display = "block";
+        };
+        {% endif %}
+    </script>
+</body>
+</html>
