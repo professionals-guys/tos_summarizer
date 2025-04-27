@@ -13,7 +13,7 @@ from flask import (
 
 )
 
-zimport nltk
+import nltk
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 from collections import Counter
