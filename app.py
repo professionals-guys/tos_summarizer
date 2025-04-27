@@ -12,6 +12,9 @@ from flask import (
     session, flash
 
 )
+
+zimport nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 from collections import Counter
 from werkzeug.security import generate_password_hash, check_password_hash
